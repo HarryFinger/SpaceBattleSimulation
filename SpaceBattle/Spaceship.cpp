@@ -7,7 +7,7 @@ Spaceship::Spaceship(Fraction fraction, uint64_t strength, uint64_t damage, doub
 }
 
 
-uint64_t Spaceship::Shoot() const
+uint64_t Spaceship::GetDamage() const
 {
     return _damage;
 }

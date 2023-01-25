@@ -5,7 +5,7 @@
 #include "Shuttle.h"
 #include "Transport.h"
 
-std::unique_ptr<Spaceship> AllianceFactory::ReleaseSpaceship(Spaceship::SpaceshipType spaceship_type, uint64_t strength,
+std::unique_ptr<Spaceship> AllianceFactory::CreateSpaceship(Spaceship::SpaceshipType spaceship_type, uint64_t strength,
                                                              uint64_t damage, double accuracy, double evasion,
                                                              const std::string &name)
 {

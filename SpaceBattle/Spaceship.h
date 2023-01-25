@@ -24,7 +24,7 @@ public:
     Spaceship(Fraction fraction, uint64_t strength, uint64_t damage, double accuracy, double evasion, const std::string& name);
     virtual ~Spaceship() = default;
 
-    uint64_t Shoot() const;
+    uint64_t GetDamage() const;
     uint64_t GetStrength() const;
     const std::string &GetName() const;
     virtual SpaceshipType GetType() const = 0;

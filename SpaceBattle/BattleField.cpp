@@ -9,11 +9,11 @@ BattleField::BattleField(std::ifstream &settings_file)
 {
     output.open("output.txt");
     _val = boost::json::parse(settings_file);
-    ReleaseArmy(Spaceship::Fraction::Alliance);
-    ReleaseArmy(Spaceship::Fraction::Empire);
+    CreateArmy(Spaceship::Fraction::Alliance);
+    CreateArmy(Spaceship::Fraction::Empire);
 }
 
-void BattleField::ReleaseArmy(Spaceship::Fraction fraction)
+void BattleField::CreateArmy(Spaceship::Fraction fraction)
 {
     std::unique_ptr<SpaceshipFactory> factory;
     std::string fraction_type;
@@ -36,7 +36,6 @@ void BattleField::ReleaseArmy(Spaceship::Fraction fraction)
         break;
     }
 
-    // TODO!
     Data data;
     boost::json::value json;
     std::string name;
@@ -47,9 +46,9 @@ void BattleField::ReleaseArmy(Spaceship::Fraction fraction)
     data.Load(json);
     for (size_t i = 0; i < data.count; i++)
     {
-        spaceships->push_back(factory->ReleaseSpaceship(Spaceship::SpaceshipType::Shuttle, data.strength, data.damage,
-                                                        data.accuracy, data.evasion,
-                                                        name + frac_posfix + std::to_string(spaceship_id++)));
+        spaceships->push_back(factory->CreateSpaceship(Spaceship::SpaceshipType::Shuttle, data.strength, data.damage,
+                                                       data.accuracy, data.evasion,
+                                                       name + frac_posfix + std::to_string(spaceship_id++)));
     }
 
     name = "Transport";
@@ -57,9 +56,9 @@ void BattleField::ReleaseArmy(Spaceship::Fraction fraction)
     data.Load(json);
     for (size_t i = 0; i < data.count; i++)
     {
-        spaceships->push_back(factory->ReleaseSpaceship(Spaceship::SpaceshipType::Transport, data.strength, data.damage,
-                                                        data.accuracy, data.evasion,
-                                                        name + frac_posfix + std::to_string(spaceship_id++)));
+        spaceships->push_back(factory->CreateSpaceship(Spaceship::SpaceshipType::Transport, data.strength, data.damage,
+                                                       data.accuracy, data.evasion,
+                                                       name + frac_posfix + std::to_string(spaceship_id++)));
     }
 
     name = "Scout";
@@ -67,9 +66,9 @@ void BattleField::ReleaseArmy(Spaceship::Fraction fraction)
     data.Load(json);
     for (size_t i = 0; i < data.count; i++)
     {
-        spaceships->push_back(factory->ReleaseSpaceship(Spaceship::SpaceshipType::Scout, data.strength, data.damage,
-                                                        data.accuracy, data.evasion,
-                                                        name + frac_posfix + std::to_string(spaceship_id++)));
+        spaceships->push_back(factory->CreateSpaceship(Spaceship::SpaceshipType::Scout, data.strength, data.damage,
+                                                       data.accuracy, data.evasion,
+                                                       name + frac_posfix + std::to_string(spaceship_id++)));
     }
 
     name = "Fighter";
@@ -77,9 +76,9 @@ void BattleField::ReleaseArmy(Spaceship::Fraction fraction)
     data.Load(json);
     for (size_t i = 0; i < data.count; i++)
     {
-        spaceships->push_back(factory->ReleaseSpaceship(Spaceship::SpaceshipType::Fighter, data.strength, data.damage,
-                                                        data.accuracy, data.evasion,
-                                                        name + frac_posfix + std::to_string(spaceship_id++)));
+        spaceships->push_back(factory->CreateSpaceship(Spaceship::SpaceshipType::Fighter, data.strength, data.damage,
+                                                       data.accuracy, data.evasion,
+                                                       name + frac_posfix + std::to_string(spaceship_id++)));
     }
 
     name = "Bomber";
@@ -87,16 +86,111 @@ void BattleField::ReleaseArmy(Spaceship::Fraction fraction)
     data.Load(json);
     for (size_t i = 0; i < data.count; i++)
     {
-        spaceships->push_back(factory->ReleaseSpaceship(Spaceship::SpaceshipType::Bomber, data.strength, data.damage,
-                                                        data.accuracy, data.evasion,
-                                                        name + frac_posfix + std::to_string(spaceship_id++)));
+        spaceships->push_back(factory->CreateSpaceship(Spaceship::SpaceshipType::Bomber, data.strength, data.damage,
+                                                       data.accuracy, data.evasion,
+                                                       name + frac_posfix + std::to_string(spaceship_id++)));
     }
 }
 
-void BattleField::LogTurnResult(std::ostream &stream, Spaceships *current_army, Spaceships *target_army,
-                                size_t current_ship, size_t target_ship, uint64_t damage)
+void BattleField::SimulateBattle()
 {
-    if ((*current_army)[current_ship]->GetFraction() == Spaceship::Fraction::Alliance)
+    Spaceships *current_army = nullptr;
+    Spaceships *target_army = nullptr;
+
+    enum class FractionTurn
+    {
+        AllianceTurn,
+        EmpireTurn
+    };
+
+    // shuffling first turn
+    FractionTurn frac_turn = random_tool::RandomValueInRange(2) ? FractionTurn::AllianceTurn : FractionTurn::EmpireTurn;
+
+    // battle begins
+    while (_alliance_army.size() > 0 and _empire_army.size() > 0)
+    {
+        switch (frac_turn)
+        {
+        case FractionTurn::AllianceTurn:
+            current_army = &_alliance_army;
+            target_army = &_empire_army;
+
+            // NEXT turn will be Empire Turn
+            frac_turn = FractionTurn::EmpireTurn;
+            break;
+        case FractionTurn::EmpireTurn:
+            current_army = &_empire_army;
+            target_army = &_alliance_army;
+
+            // NEXT turn will be Alliance Turn
+            frac_turn = FractionTurn::AllianceTurn;
+            break;
+        }
+
+        size_t current_army_size = current_army->size();
+        size_t target_army_size = target_army->size();
+
+        size_t current_ship_index = random_tool::RandomValueInRange((uint32_t)current_army_size);
+        size_t target_ship_index = random_tool::RandomValueInRange((uint32_t)target_army_size);
+
+        Spaceship *shooter = (*current_army)[current_ship_index].get();
+        Spaceship *target = (*target_army)[target_ship_index].get();
+
+        uint64_t damage = CalculateDamage(shooter, target);
+        target->ApplyDamage(damage);
+
+        // turn result info
+        LogTurnResult(output, shooter, target, damage);
+
+        // destroy target army spaceship if strength is less or equal to 0
+        if (target->GetStrength() == 0)
+        {
+            std::swap((*target_army)[target_ship_index], (*target_army)[target_army_size - 1]);
+            target_army->pop_back();
+        }
+    }
+
+    // battle result info
+    LogResultInfo(output, current_army);
+}
+
+uint64_t BattleField::CalculateDamage(const Spaceship *shooter, const Spaceship *target) const
+{
+    // result damage calculation based on accuracy
+    uint64_t damage = shooter->GetDamage();
+    double current_ship_accuracy = shooter->GetAccuracy();
+    // trying to hit the target, seed value from 0 to 1
+    double rand_value = random_tool::RandomValueInRange(100) / 100.0;
+
+    if (current_ship_accuracy < rand_value)
+    {
+        // missed
+        return 0;
+    }
+    // if not missed
+    else
+    {
+        // calculate damage based on evasion
+        double target_ship_evasion = target->GetEvasion();
+        // trying to evade, seed value from 0 to 1
+        rand_value = random_tool::RandomValueInRange(100) / 100.0;
+
+        if (target_ship_evasion < rand_value)
+        {
+            // evade not happens
+            return damage;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+}
+
+void BattleField::LogTurnResult(std::ostream &stream, const Spaceship *shooter, const Spaceship *target,
+                                uint64_t damage) const
+{
+    if (shooter->GetFraction() == Spaceship::Fraction::Alliance)
     {
         stream << "Alliance: ";
     }
@@ -104,12 +198,11 @@ void BattleField::LogTurnResult(std::ostream &stream, Spaceships *current_army, 
     {
         stream << "Empire: ";
     }
-    stream << (*current_army)[current_ship]->GetName() << " shoots at " << (*target_army)[target_ship]->GetName()
-           << ". Result: " << damage << " damage, " << (*target_army)[target_ship]->GetStrength() << " strength left."
-           << std::endl;
+    stream << shooter->GetName() << " shoots at " << target->GetName() << ". Result: " << damage << " damage, "
+           << target->GetStrength() << " strength left." << std::endl;
 }
 
-void BattleField::LogResultInfo(std::ostream &stream, Spaceships *current_army)
+void BattleField::LogResultInfo(std::ostream &stream, const Spaceships *current_army) const
 {
     stream << "\n-----------------------------------------------------------------------------------------\n\n";
 
@@ -153,88 +246,6 @@ void BattleField::LogResultInfo(std::ostream &stream, Spaceships *current_army)
     stream << "Remaining spaceships: " << current_army->size() << "\n\nShuttle: " << shuttles_remain
            << "\nTransport: " << transports_remain << "\nScout: " << scout_remain << "\nFighter: " << fighter_remain
            << "\nBomber: " << bomber_remain << std::endl;
-}
-
-void BattleField::SimulateBattle()
-{
-    Spaceships *current_army = nullptr;
-    Spaceships *target_army = nullptr;
-
-    enum class FractionTurn
-    {
-        AllianceTurn,
-        EmpireTurn
-    };
-
-    // shuffling first turn
-    FractionTurn frac_turn = random_tool::RandomValueInRange(2) ? FractionTurn::AllianceTurn : FractionTurn::EmpireTurn;
-
-    // battle begins
-    while (_alliance_army.size() > 0 and _empire_army.size() > 0)
-    {
-        switch (frac_turn)
-        {
-        case FractionTurn::AllianceTurn:
-            current_army = &_alliance_army;
-            target_army = &_empire_army;
-
-            // NEXT turn will be Empire Turn
-            frac_turn = FractionTurn::EmpireTurn;
-            break;
-        case FractionTurn::EmpireTurn:
-            current_army = &_empire_army;
-            target_army = &_alliance_army;
-
-            // NEXT turn will be Alliance Turn
-            frac_turn = FractionTurn::AllianceTurn;
-            break;
-        }
-
-        size_t current_army_size = current_army->size();
-        size_t target_army_size = target_army->size();
-
-        size_t current_ship = random_tool::RandomValueInRange((uint32_t)current_army_size);
-        size_t target_ship = random_tool::RandomValueInRange((uint32_t)target_army_size);
-
-        // result damage calculation based on accuracy
-        uint64_t damage = (*current_army)[current_ship]->Shoot();
-        double current_ship_accuracy = (*current_army)[current_ship]->GetAccuracy();
-        // trying to hit the target, seed value from 0 to 1
-        double seed_value = random_tool::RandomValueInRange(100) / 100.0;
-
-        if (current_ship_accuracy < seed_value)
-        {
-            // missed
-            damage = 0;
-        }
-        // if not missed
-        else
-        {
-            // applying damage based on evasion
-            double target_ship_evasion = (*target_army)[target_ship]->GetEvasion();
-            // trying to evade, seed value from 0 to 1
-            seed_value = random_tool::RandomValueInRange(100) / 100.0;
-
-            if (target_ship_evasion < seed_value)
-            {
-                // evade not happens
-                (*target_army)[target_ship]->ApplyDamage(damage);
-            }
-        }
-
-        // turn result info
-        LogTurnResult(output, current_army, target_army, current_ship, target_ship, damage);
-
-        // destroy target army spaceship if strength is less or equal to 0
-        if ((*target_army)[target_ship]->GetStrength() == 0)
-        {
-            std::swap((*target_army)[target_ship], (*target_army)[target_army_size - 1]);
-            target_army->pop_back();
-        }
-    }
-
-    // battle result info
-    LogResultInfo(output, current_army);
 }
 
 void BattleField::Data::Load(boost::json::value &json)

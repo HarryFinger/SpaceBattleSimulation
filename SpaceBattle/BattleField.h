@@ -12,11 +12,7 @@ public:
     void SimulateBattle();
 
 private:
-    void ReleaseArmy(Spaceship::Fraction fraction_type);
     using Spaceships = std::vector<std::unique_ptr<Spaceship>>;
-    void LogTurnResult(std::ostream &stream, Spaceships *current_army, Spaceships *target_army, size_t current_ship,
-                       size_t target_ship, uint64_t damage);
-    void LogResultInfo(std::ostream &stream, Spaceships *current_army);
 
     struct Data
     {
@@ -28,6 +24,11 @@ private:
         double evasion;
         uint64_t count;
     };
+
+    void CreateArmy(Spaceship::Fraction fraction_type);
+    uint64_t CalculateDamage(const Spaceship *shooter, const Spaceship *target) const;
+    void LogTurnResult(std::ostream &stream, const Spaceship *shooter, const Spaceship *target, uint64_t damage) const;
+    void LogResultInfo(std::ostream &stream, const Spaceships *current_army) const;
 
 private:
     std::ofstream output;
