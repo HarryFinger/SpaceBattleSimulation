@@ -1,0 +1,86 @@
+{ 
+"Alliance": { 
+    "Shuttle": { 
+        "Strength": 10, 
+        "Damage": 4, 
+        "Accuracy": 0.5, 
+        "Evasion": 0.1, 
+        "Count": 11
+    },
+
+    "Transport": {
+        "Strength": 30, 
+        "Damage": 6, 
+        "Accuracy": 0.55, 
+        "Evasion": 0.0, 
+        "Count": 4
+    },
+
+    "Scout": { 
+        "Strength": 60, 
+        "Damage": 9, 
+        "Accuracy": 0.6, 
+        "Evasion": 0.3, 
+        "Count": 4
+    },
+
+    "Fighter": { 
+        "Strength": 40, 
+        "Damage": 15, 
+        "Accuracy": 0.75, 
+        "Evasion": 0.3,
+        "Count": 5
+    },
+
+    "Bomber": { 
+        "Strength": 20, 
+        "Damage": 20, 
+        "Accuracy": 0.95, 
+        "Evasion": 0.2, 
+        "Count": 1
+    }
+}, 
+
+"Empire": { 
+    "Shuttle": { 
+        "Strength": 8, 
+        "Damage": 5, 
+        "Accuracy": 0.7, 
+        "Evasion": 0.1, 
+        "Count": 10
+    },
+
+    "Transport": {
+        "Strength": 25, 
+        "Damage": 9, 
+        "Accuracy": 0.80, 
+        "Evasion": 0.05, 
+        "Count": 5
+    },
+
+    "Scout": { 
+        "Strength": 50, 
+        "Damage": 14, 
+        "Accuracy": 0.8, 
+        "Evasion": 0.2, 
+        "Count": 5
+    },
+
+    "Fighter": { 
+        "Strength": 30, 
+        "Damage": 25, 
+        "Accuracy": 0.90, 
+        "Evasion": 0.2,
+        "Count": 3
+    },
+
+    "Bomber": { 
+        "Strength": 15, 
+        "Damage": 30, 
+        "Accuracy": 1.00, 
+        "Evasion": 0.15, 
+        "Count": 2
+    }
+} 
+
+} 
