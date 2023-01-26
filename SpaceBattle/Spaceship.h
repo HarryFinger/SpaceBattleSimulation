@@ -1,5 +1,4 @@
 #pragma once
-#include <cstdint>
 #include <string>
 
 class Spaceship
@@ -12,7 +11,7 @@ public:
         Transport,
         Scout,
         Fighter,
-        Bomber,
+        Bomber
     };
 
     enum class Fraction

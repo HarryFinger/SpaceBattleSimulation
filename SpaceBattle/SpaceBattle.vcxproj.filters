@@ -51,9 +51,6 @@
     <ClCompile Include="BattleField.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SpaceshipFactory.cpp">
-      <Filter>Source Files\Factory</Filter>
-    </ClCompile>
     <ClCompile Include="AllianceFactory.cpp">
       <Filter>Source Files\Factory</Filter>
     </ClCompile>

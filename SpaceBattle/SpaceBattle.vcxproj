@@ -134,7 +134,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="RandomTool.cpp" />
-    <ClCompile Include="SpaceshipFactory.cpp" />
     <ClCompile Include="AllianceFactory.cpp" />
     <ClCompile Include="BattleField.cpp" />
     <ClCompile Include="Bomber.cpp" />

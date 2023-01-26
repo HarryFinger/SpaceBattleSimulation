@@ -8,7 +8,7 @@
 class SpaceshipsData
 {
 public:
-    SpaceshipsData(std::ifstream &settings_file);
+    SpaceshipsData();
 
     struct Data
     {

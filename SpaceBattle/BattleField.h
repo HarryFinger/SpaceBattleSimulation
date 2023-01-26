@@ -1,11 +1,11 @@
 #pragma once
-#include "SpaceshipFactory.h"
+#include "Spaceship.h"
 #include "SpaceshipTypes.h"
-#include "SpaceshipsData.h"
-#include <boost/json.hpp>
 #include <fstream>
 #include <memory>
 #include <vector>
+
+class SpaceshipsData;
 
 class BattleField
 {
@@ -16,7 +16,7 @@ public:
 private:
     using Spaceships = std::vector<std::unique_ptr<Spaceship>>;
 
-    //set in BattleField constructor for each fraction
+    // set in BattleField constructor for each fraction
     struct ArmyStruture
     {
         size_t shuttle_count;

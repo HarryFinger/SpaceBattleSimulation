@@ -1,8 +1,11 @@
 #include "SpaceshipsData.h"
 #include "Spaceship.h"
 
-SpaceshipsData::SpaceshipsData(std::ifstream &settings_file)
+SpaceshipsData::SpaceshipsData()
 {
+    std::ifstream settings_file;
+    settings_file.open("settings.json");
+
     boost::json::value _val = boost::json::parse(settings_file);
 
     Data data{};
@@ -36,6 +39,8 @@ SpaceshipsData::SpaceshipsData(std::ifstream &settings_file)
 
         current_type = static_cast<SpaceshipTypes::Types>(type_index);
     }
+
+    settings_file.close();
 }
 
 SpaceshipsData::Data SpaceshipsData::GetDataByType(SpaceshipTypes::Types type)

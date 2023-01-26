@@ -2,8 +2,6 @@
 #include "AllianceFactory.h"
 #include "EmpireFactory.h"
 #include "RandomTool.h"
-#include <iostream>
-#include <random>
 
 BattleField::BattleField(SpaceshipsData *spaceships_data) : _spaceships_data(spaceships_data)
 {
