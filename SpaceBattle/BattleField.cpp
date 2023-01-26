@@ -5,8 +5,7 @@
 
 BattleField::BattleField(SpaceshipsData *spaceships_data) : _spaceships_data(spaceships_data)
 {
-    _output.open("output.txt");
-
+    _output = std::make_unique<std::ofstream>("output.txt");
     // task was ambiguous
     // on the one hand, the task indicated "the amount to install independently",
     // on the other hand, "read from JSON"
@@ -116,7 +115,7 @@ void BattleField::SimulateBattle()
         target->ApplyDamage(damage);
 
         // turn result info
-        LogTurnResult(_output, shooter, target, damage);
+        LogTurnResult(_output.get(), shooter, target, damage);
 
         // destroy target army spaceship if strength is less or equal to 0
         if (target->GetStrength() == 0)
@@ -127,7 +126,7 @@ void BattleField::SimulateBattle()
     }
 
     // battle result info
-    LogResultInfo(_output, current_army);
+    LogResultInfo(_output.get(), current_army);
 }
 
 uint64_t BattleField::CalculateDamage(const Spaceship *shooter, const Spaceship *target) const
@@ -163,32 +162,32 @@ uint64_t BattleField::CalculateDamage(const Spaceship *shooter, const Spaceship 
     }
 }
 
-void BattleField::LogTurnResult(std::ostream &stream, const Spaceship *shooter, const Spaceship *target,
+void BattleField::LogTurnResult(std::ostream *stream, const Spaceship *shooter, const Spaceship *target,
                                 uint64_t damage) const
 {
     if (shooter->GetFraction() == Spaceship::Fraction::Alliance)
     {
-        stream << "Alliance: ";
+        *stream << "Alliance: ";
     }
     else
     {
-        stream << "Empire: ";
+        *stream << "Empire: ";
     }
-    stream << shooter->GetName() << " shoots at " << target->GetName() << ". Result: " << damage << " damage, "
+    *stream << shooter->GetName() << " shoots at " << target->GetName() << ". Result: " << damage << " damage, "
            << target->GetStrength() << " strength left." << std::endl;
 }
 
-void BattleField::LogResultInfo(std::ostream &stream, const Spaceships *current_army) const
+void BattleField::LogResultInfo(std::ostream *stream, const Spaceships *current_army) const
 {
-    stream << "\n-----------------------------------------------------------------------------------------\n\n";
+    *stream << "\n-----------------------------------------------------------------------------------------\n\n";
 
     if (_alliance_army.size() == 0)
     {
-        stream << "Empire won." << std::endl;
+        *stream << "Empire won." << std::endl;
     }
     else
     {
-        stream << "Alliance won." << std::endl;
+        *stream << "Alliance won." << std::endl;
     }
 
     size_t shuttles_remain{};
@@ -219,7 +218,7 @@ void BattleField::LogResultInfo(std::ostream &stream, const Spaceships *current_
         }
     }
 
-    stream << "Remaining spaceships: " << current_army->size() << "\n\nShuttle: " << shuttles_remain
+    *stream << "Remaining spaceships: " << current_army->size() << "\n\nShuttle: " << shuttles_remain
            << "\nTransport: " << transports_remain << "\nScout: " << scout_remain << "\nFighter: " << fighter_remain
            << "\nBomber: " << bomber_remain << std::endl;
 }

@@ -157,7 +157,6 @@
     <ClInclude Include="Scout.h" />
     <ClInclude Include="Shuttle.h" />
     <ClInclude Include="Spaceship.h" />
-    <ClInclude Include="SpaceshipTypes.h" />
     <ClInclude Include="SpaceshipsData.h" />
     <ClInclude Include="Transport.h" />
   </ItemGroup>

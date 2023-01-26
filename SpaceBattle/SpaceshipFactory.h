@@ -1,6 +1,5 @@
 #pragma once
 #include "Spaceship.h"
-#include "SpaceshipTypes.h"
 #include <memory>
 
 class SpaceshipsData;

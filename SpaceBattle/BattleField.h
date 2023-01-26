@@ -1,6 +1,5 @@
 #pragma once
 #include "Spaceship.h"
-#include "SpaceshipTypes.h"
 #include <fstream>
 #include <memory>
 #include <vector>
@@ -28,12 +27,12 @@ private:
 
     void CreateArmy(Spaceship::Fraction fraction_type, const ArmyStruture &army_structure);
     uint64_t CalculateDamage(const Spaceship *shooter, const Spaceship *target) const;
-    void LogTurnResult(std::ostream &stream, const Spaceship *shooter, const Spaceship *target, uint64_t damage) const;
-    void LogResultInfo(std::ostream &stream, const Spaceships *current_army) const;
+    void LogTurnResult(std::ostream *stream, const Spaceship *shooter, const Spaceship *target, uint64_t damage) const;
+    void LogResultInfo(std::ostream *stream, const Spaceships *current_army) const;
 
 private:
     SpaceshipsData *_spaceships_data;
-    std::ofstream _output;
+    std::unique_ptr<std::ostream> _output;
     Spaceships _alliance_army;
     Spaceships _empire_army;
 };

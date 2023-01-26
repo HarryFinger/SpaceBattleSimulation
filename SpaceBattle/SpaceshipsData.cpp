@@ -1,5 +1,4 @@
 #include "SpaceshipsData.h"
-#include "Spaceship.h"
 
 SpaceshipsData::SpaceshipsData()
 {
@@ -12,12 +11,12 @@ SpaceshipsData::SpaceshipsData()
     boost::json::value json;
     std::string name;
 
-    SpaceshipTypes::Types current_type = SpaceshipTypes::Types::AllianceShuttle;
+    SpaceshipID current_type = SpaceshipID::AllianceShuttle;
 
     size_t type_index = 0;
 
     // Alliance spaceships parser
-    for (; type_index != SpaceshipTypes::Types::EmpireShuttle; ++type_index)
+    for (; type_index != SpaceshipID::EmpireShuttle; ++type_index)
     {
         name = GetNameByType(current_type);
         json = _val.as_object()["Alliance"].as_object()[name];
@@ -25,11 +24,11 @@ SpaceshipsData::SpaceshipsData()
         auto data = Load(json);
         _data_map.insert({current_type, data});
 
-        current_type = static_cast<SpaceshipTypes::Types>(type_index);
+        current_type = static_cast<SpaceshipID>(type_index);
     }
 
     // Empire spaceships parser
-    for (; type_index != SpaceshipTypes::Types::Count; ++type_index)
+    for (; type_index != SpaceshipID::Count; ++type_index)
     {
         name = GetNameByType(current_type);
         json = _val.as_object()["Empire"].as_object()[name];
@@ -37,40 +36,40 @@ SpaceshipsData::SpaceshipsData()
         auto data = Load(json);
         _data_map.insert({current_type, data});
 
-        current_type = static_cast<SpaceshipTypes::Types>(type_index);
+        current_type = static_cast<SpaceshipID>(type_index);
     }
 
     settings_file.close();
 }
 
-SpaceshipsData::Data SpaceshipsData::GetDataByType(SpaceshipTypes::Types type)
+SpaceshipsData::Data SpaceshipsData::GetDataByType(SpaceshipID spaceship_id)
 {
-    return _data_map[type];
+    return _data_map[spaceship_id];
 }
 
-std::string SpaceshipsData::GetNameByType(SpaceshipTypes::Types type) const
+std::string SpaceshipsData::GetNameByType(SpaceshipID spaceship_id) const
 {
-    switch (type)
+    switch (spaceship_id)
     {
-    case SpaceshipTypes::Types::AllianceShuttle:
+    case SpaceshipID::AllianceShuttle:
         return "Shuttle";
-    case SpaceshipTypes::Types::AllianceTransport:
+    case SpaceshipID::AllianceTransport:
         return "Transport";
-    case SpaceshipTypes::Types::AllianceScout:
+    case SpaceshipID::AllianceScout:
         return "Scout";
-    case SpaceshipTypes::Types::AllianceFighter:
+    case SpaceshipID::AllianceFighter:
         return "Fighter";
-    case SpaceshipTypes::Types::AllianceBomber:
+    case SpaceshipID::AllianceBomber:
         return "Bomber";
-    case SpaceshipTypes::Types::EmpireShuttle:
+    case SpaceshipID::EmpireShuttle:
         return "Shuttle";
-    case SpaceshipTypes::Types::EmpireTransport:
+    case SpaceshipID::EmpireTransport:
         return "Transport";
-    case SpaceshipTypes::Types::EmpireScout:
+    case SpaceshipID::EmpireScout:
         return "Scout";
-    case SpaceshipTypes::Types::EmpireFighter:
+    case SpaceshipID::EmpireFighter:
         return "Fighter";
-    case SpaceshipTypes::Types::EmpireBomber:
+    case SpaceshipID::EmpireBomber:
         return "Bomber";
 
     default:

@@ -101,8 +101,5 @@
     <ClInclude Include="SpaceshipsData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SpaceshipTypes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>
