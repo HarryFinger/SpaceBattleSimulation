@@ -63,6 +63,9 @@
     <ClCompile Include="RandomTool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SpaceshipsData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shuttle.h">
@@ -96,6 +99,12 @@
       <Filter>Header Files\Factory</Filter>
     </ClInclude>
     <ClInclude Include="RandomTool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SpaceshipsData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SpaceshipTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

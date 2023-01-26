@@ -5,90 +5,68 @@
 #include <iostream>
 #include <random>
 
-BattleField::BattleField(std::ifstream &settings_file)
+BattleField::BattleField(SpaceshipsData *spaceships_data) : _spaceships_data(spaceships_data)
 {
-    output.open("output.txt");
-    _val = boost::json::parse(settings_file);
-    CreateArmy(Spaceship::Fraction::Alliance);
-    CreateArmy(Spaceship::Fraction::Empire);
+    _output.open("output.txt");
+
+    // task was ambiguous
+    // on the one hand, the task indicated "the amount to install independently",
+    // on the other hand, "read from JSON"
+    // in any case, it was decided to leave count field in SpaceshipsData
+    ArmyStruture alliance_army_structure{2, 2, 1, 2, 1};
+    CreateArmy(Spaceship::Fraction::Alliance, alliance_army_structure);
+
+    ArmyStruture empire_army_structure{1, 2, 2, 1, 1};
+    CreateArmy(Spaceship::Fraction::Empire, empire_army_structure);
 }
 
-void BattleField::CreateArmy(Spaceship::Fraction fraction)
+void BattleField::CreateArmy(Spaceship::Fraction fraction, const ArmyStruture &army_structure)
 {
     std::unique_ptr<SpaceshipFactory> factory;
-    std::string fraction_type;
     Spaceships *spaceships = nullptr;
-    std::string frac_posfix;
+
+    size_t fraction_id = 1;
 
     switch (fraction)
     {
     case Spaceship::Fraction::Alliance:
-        factory = std::make_unique<AllianceFactory>();
-        fraction_type = "Alliance";
+        factory = std::make_unique<AllianceFactory>(_spaceships_data);
         spaceships = &_alliance_army;
-        frac_posfix = "-A";
         break;
     case Spaceship::Fraction::Empire:
-        factory = std::make_unique<EmpireFactory>();
-        fraction_type = "Empire";
+        factory = std::make_unique<EmpireFactory>(_spaceships_data);
         spaceships = &_empire_army;
-        frac_posfix = "-E";
         break;
     }
 
-    Data data;
-    boost::json::value json;
-    std::string name;
-    size_t spaceship_id = 1;
-
-    name = "Shuttle";
-    json = _val.as_object()[fraction_type].as_object()[name];
-    data.Load(json);
-    for (size_t i = 0; i < data.count; i++)
+    for (size_t i = 0; i < army_structure.shuttle_count; i++)
     {
-        spaceships->push_back(factory->CreateSpaceship(Spaceship::SpaceshipType::Shuttle, data.strength, data.damage,
-                                                       data.accuracy, data.evasion,
-                                                       name + frac_posfix + std::to_string(spaceship_id++)));
+        spaceships->push_back(factory->CreateShuttle(fraction_id));
+        ++fraction_id;
     }
 
-    name = "Transport";
-    json = _val.as_object()[fraction_type].as_object()[name];
-    data.Load(json);
-    for (size_t i = 0; i < data.count; i++)
+    for (size_t i = 0; i < army_structure.transport_count; i++)
     {
-        spaceships->push_back(factory->CreateSpaceship(Spaceship::SpaceshipType::Transport, data.strength, data.damage,
-                                                       data.accuracy, data.evasion,
-                                                       name + frac_posfix + std::to_string(spaceship_id++)));
+        spaceships->push_back(factory->CreateTransport(fraction_id));
+        ++fraction_id;
     }
 
-    name = "Scout";
-    json = _val.as_object()[fraction_type].as_object()[name];
-    data.Load(json);
-    for (size_t i = 0; i < data.count; i++)
+    for (size_t i = 0; i < army_structure.scout_count; i++)
     {
-        spaceships->push_back(factory->CreateSpaceship(Spaceship::SpaceshipType::Scout, data.strength, data.damage,
-                                                       data.accuracy, data.evasion,
-                                                       name + frac_posfix + std::to_string(spaceship_id++)));
+        spaceships->push_back(factory->CreateScout(fraction_id));
+        ++fraction_id;
     }
 
-    name = "Fighter";
-    json = _val.as_object()[fraction_type].as_object()[name];
-    data.Load(json);
-    for (size_t i = 0; i < data.count; i++)
+    for (size_t i = 0; i < army_structure.fighter_count; i++)
     {
-        spaceships->push_back(factory->CreateSpaceship(Spaceship::SpaceshipType::Fighter, data.strength, data.damage,
-                                                       data.accuracy, data.evasion,
-                                                       name + frac_posfix + std::to_string(spaceship_id++)));
+        spaceships->push_back(factory->CreateFighter(fraction_id));
+        ++fraction_id;
     }
 
-    name = "Bomber";
-    json = _val.as_object()[fraction_type].as_object()[name];
-    data.Load(json);
-    for (size_t i = 0; i < data.count; i++)
+    for (size_t i = 0; i < army_structure.bomber_count; i++)
     {
-        spaceships->push_back(factory->CreateSpaceship(Spaceship::SpaceshipType::Bomber, data.strength, data.damage,
-                                                       data.accuracy, data.evasion,
-                                                       name + frac_posfix + std::to_string(spaceship_id++)));
+        spaceships->push_back(factory->CreateBomber(fraction_id));
+        ++fraction_id;
     }
 }
 
@@ -140,7 +118,7 @@ void BattleField::SimulateBattle()
         target->ApplyDamage(damage);
 
         // turn result info
-        LogTurnResult(output, shooter, target, damage);
+        LogTurnResult(_output, shooter, target, damage);
 
         // destroy target army spaceship if strength is less or equal to 0
         if (target->GetStrength() == 0)
@@ -151,7 +129,7 @@ void BattleField::SimulateBattle()
     }
 
     // battle result info
-    LogResultInfo(output, current_army);
+    LogResultInfo(_output, current_army);
 }
 
 uint64_t BattleField::CalculateDamage(const Spaceship *shooter, const Spaceship *target) const
@@ -246,13 +224,4 @@ void BattleField::LogResultInfo(std::ostream &stream, const Spaceships *current_
     stream << "Remaining spaceships: " << current_army->size() << "\n\nShuttle: " << shuttles_remain
            << "\nTransport: " << transports_remain << "\nScout: " << scout_remain << "\nFighter: " << fighter_remain
            << "\nBomber: " << bomber_remain << std::endl;
-}
-
-void BattleField::Data::Load(boost::json::value &json)
-{
-    strength = (uint64_t)json.as_object()["Strength"].as_int64();
-    damage = (uint64_t)json.as_object()["Damage"].as_int64();
-    accuracy = json.as_object()["Accuracy"].as_double();
-    evasion = json.as_object()["Evasion"].as_double();
-    count = (uint64_t)json.as_object()["Count"].as_int64();
 }

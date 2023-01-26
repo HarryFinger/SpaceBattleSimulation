@@ -3,26 +3,65 @@
 #include "Fighter.h"
 #include "Scout.h"
 #include "Shuttle.h"
+#include "SpaceshipsData.h"
 #include "Transport.h"
 
-std::unique_ptr<Spaceship> AllianceFactory::CreateSpaceship(Spaceship::SpaceshipType spaceship_type, uint64_t strength,
-                                                             uint64_t damage, double accuracy, double evasion,
-                                                             const std::string &name)
+namespace
 {
-    Spaceship::Fraction fraction = Spaceship::Fraction::Alliance;
-    switch (spaceship_type)
-    {
-    case Spaceship::SpaceshipType::Shuttle:
-        return std::make_unique<Shuttle>(fraction, strength, damage, accuracy, evasion, name);
-    case Spaceship::SpaceshipType::Transport:
-        return std::make_unique<Transport>(fraction, strength, damage, accuracy, evasion, name);
-    case Spaceship::SpaceshipType::Scout:
-        return std::make_unique<Scout>(fraction, strength, damage, accuracy, evasion, name);
-    case Spaceship::SpaceshipType::Fighter:
-        return std::make_unique<Fighter>(fraction, strength, damage, accuracy, evasion, name);
-    case Spaceship::SpaceshipType::Bomber:
-        return std::make_unique<Bomber>(fraction, strength, damage, accuracy, evasion, name);
-    default:
-        return nullptr;
-    }
+const std::string fraction_posfix = "-A";
+}
+
+
+AllianceFactory::AllianceFactory(SpaceshipsData *spaceships_data) : SpaceshipFactory(spaceships_data)
+{
+}
+
+std::unique_ptr<Spaceship> AllianceFactory::CreateShuttle(size_t fraction_id)
+{
+    SpaceshipTypes::Types type = SpaceshipTypes::Types::AllianceShuttle;
+    auto val = _spaceships_data->GetDataByType(type);
+    std::string name = _spaceships_data->GetNameByType(type) + fraction_posfix + std::to_string(fraction_id);
+
+    return std::make_unique<Shuttle>(Spaceship::Fraction::Alliance, val._strength, val._damage, val._accuracy,
+                                     val._evasion, name);
+}
+
+std::unique_ptr<Spaceship> AllianceFactory::CreateTransport(size_t fraction_id)
+{
+    SpaceshipTypes::Types type = SpaceshipTypes::Types::AllianceTransport;
+    auto val = _spaceships_data->GetDataByType(type);
+    std::string name = _spaceships_data->GetNameByType(type) + fraction_posfix + std::to_string(fraction_id);
+
+    return std::make_unique<Transport>(Spaceship::Fraction::Alliance, val._strength, val._damage, val._accuracy,
+                                     val._evasion, name);
+}
+
+std::unique_ptr<Spaceship> AllianceFactory::CreateScout(size_t fraction_id)
+{
+    SpaceshipTypes::Types type = SpaceshipTypes::Types::AllianceScout;
+    auto val = _spaceships_data->GetDataByType(type);
+    std::string name = _spaceships_data->GetNameByType(type) + fraction_posfix + std::to_string(fraction_id);
+
+    return std::make_unique<Scout>(Spaceship::Fraction::Alliance, val._strength, val._damage, val._accuracy,
+                                       val._evasion, name);
+}
+
+std::unique_ptr<Spaceship> AllianceFactory::CreateFighter(size_t fraction_id)
+{
+    SpaceshipTypes::Types type = SpaceshipTypes::Types::AllianceFighter;
+    auto val = _spaceships_data->GetDataByType(type);
+    std::string name = _spaceships_data->GetNameByType(type) + fraction_posfix + std::to_string(fraction_id);
+
+    return std::make_unique<Fighter>(Spaceship::Fraction::Alliance, val._strength, val._damage, val._accuracy,
+                                   val._evasion, name);
+}
+
+std::unique_ptr<Spaceship> AllianceFactory::CreateBomber(size_t fraction_id)
+{
+    SpaceshipTypes::Types type = SpaceshipTypes::Types::AllianceBomber;
+    auto val = _spaceships_data->GetDataByType(type);
+    std::string name = _spaceships_data->GetNameByType(type) + fraction_posfix + std::to_string(fraction_id);
+
+    return std::make_unique<Bomber>(Spaceship::Fraction::Alliance, val._strength, val._damage, val._accuracy,
+                                     val._evasion, name);
 }

@@ -1,5 +1,7 @@
 #pragma once
 #include "SpaceshipFactory.h"
+#include "SpaceshipTypes.h"
+#include "SpaceshipsData.h"
 #include <boost/json.hpp>
 #include <fstream>
 #include <memory>
@@ -8,31 +10,30 @@
 class BattleField
 {
 public:
-    BattleField(std::ifstream &settings_file);
+    BattleField(SpaceshipsData *spaceships_data);
     void SimulateBattle();
 
 private:
     using Spaceships = std::vector<std::unique_ptr<Spaceship>>;
 
-    struct Data
+    //set in BattleField constructor for each fraction
+    struct ArmyStruture
     {
-        void Load(boost::json::value &json);
-
-        uint64_t strength;
-        uint64_t damage;
-        double accuracy;
-        double evasion;
-        uint64_t count;
+        size_t shuttle_count;
+        size_t transport_count;
+        size_t scout_count;
+        size_t fighter_count;
+        size_t bomber_count;
     };
 
-    void CreateArmy(Spaceship::Fraction fraction_type);
+    void CreateArmy(Spaceship::Fraction fraction_type, const ArmyStruture &army_structure);
     uint64_t CalculateDamage(const Spaceship *shooter, const Spaceship *target) const;
     void LogTurnResult(std::ostream &stream, const Spaceship *shooter, const Spaceship *target, uint64_t damage) const;
     void LogResultInfo(std::ostream &stream, const Spaceships *current_army) const;
 
 private:
-    std::ofstream output;
-    boost::json::value _val;
+    SpaceshipsData *_spaceships_data;
+    std::ofstream _output;
     Spaceships _alliance_army;
     Spaceships _empire_army;
 };

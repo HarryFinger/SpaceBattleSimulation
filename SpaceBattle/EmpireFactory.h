@@ -1,10 +1,16 @@
 #pragma once
 #include "SpaceshipFactory.h"
 
+class SpaceshipsData;
 
-class EmpireFactory : public SpaceshipFactory
+class EmpireFactory final : public SpaceshipFactory
 {
 public:
-    std::unique_ptr<Spaceship> CreateSpaceship(Spaceship::SpaceshipType spaceship_type, uint64_t strength, uint64_t damage, double accuracy, double evasion,
-                                                const std::string &name) override;
+    EmpireFactory(SpaceshipsData *spaceships_data);
+
+    std::unique_ptr<Spaceship> CreateShuttle(size_t fraction_id) override;
+    std::unique_ptr<Spaceship> CreateTransport(size_t fraction_id) override;
+    std::unique_ptr<Spaceship> CreateScout(size_t fraction_id) override;
+    std::unique_ptr<Spaceship> CreateFighter(size_t fraction_id) override;
+    std::unique_ptr<Spaceship> CreateBomber(size_t fraction_id) override;
 };
